@@ -1,0 +1,10 @@
+#Ignorar entorno virtual
+bsky/
+
+#archivos de entorno
+.env
+
+.vscode
+
+
+*.log
