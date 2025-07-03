@@ -1,31 +1,58 @@
 from atproto import Client
 import json
+from collections import Counter
+
+
+client=Client()
 
 def main():
-    client=Client()
 
     try:
         client.login('roinelperez.bsky.social','lhj5-tnbz-o7xq-36hn')
-        termino_busq='#cuba'
-        respuesta=client.app.bsky.feed.search_posts({'q':termino_busq, 'limit':25})
-
-        posts=respuesta.model_config
-
-        print(posts)
-        exit()
-        posts_lista=[]
-        for post in posts:
-            posts_lista.append(post.model_dump())
-
-        with open('datos.json','w',encoding='utf-8') as archivo:
-            json.dump(posts_lista, archivo, ensure_ascii=False, indent=4)
-
-        
-
     except Exception as e:
         print("Error: ", e)
         return
 
+def buscar_posts_palabras_clave(palabras_clave:list,limite=50):
+    resultados=[]
+
+    for palabra in palabras_clave:
+        respuesta=client.app.bsky.feed.search_posts({'q':palabra, 'limit':limite})
+
+        posts=respuesta.posts
+
+        for post in posts:
+            resultados.append(post.model_dump())
+
+    return resultados
 
 if __name__=="__main__":
     main()
+
+def obtener_datos_json(archivo:str):
+    with open(archivo, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    return data
+    
+    
+    
+def contar_publicaciones_autor(handle_autor, fuente_datos:str='datos.json'):
+    '''
+    Permite contar la cantidad de publicaciones para un autor
+    
+    '''
+    
+    data= obtener_datos_json(fuente_datos)
+    cont=0
+    for d in data:
+        autor=d.get('author',{})
+
+        handle=autor.get('handle',{})
+
+        if(handle==handle_autor):
+            cont+=1
+
+    return cont
+
+n=contar_publicaciones_autor('autodefensas.bsky.social','datos.json')
+print(n)
