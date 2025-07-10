@@ -1,5 +1,6 @@
 from atproto import Client
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 import json
 from collections import Counter
 
@@ -56,11 +57,16 @@ def contar_publicaciones_autor(handle_autor, fuente_datos:str='datos.json'):
     return cont
 
 
-es=Elasticsearch()
+es=Elasticsearch("localhost:9200")
 
 with open('datos.json') as f:
-    datos=f.read()
-    datos=json.loads(datos)
+    datos=json.load(f)
+
+actions=[
+    {
+        "_index":
+    }
+]
 
 result=es.index(index='indice_bsky',body=datos)
 
