@@ -1,4 +1,5 @@
 from atproto import Client
+from elasticsearch import Elasticsearch
 import json
 from collections import Counter
 
@@ -26,8 +27,8 @@ def buscar_posts_palabras_clave(palabras_clave:list,limite=50):
 
     return resultados
 
-if __name__=="__main__":
-    main()
+# if __name__=="__main__":
+#     main()
 
 def obtener_datos_json(archivo:str):
     with open(archivo, 'r', encoding='utf-8') as f:
@@ -54,5 +55,13 @@ def contar_publicaciones_autor(handle_autor, fuente_datos:str='datos.json'):
 
     return cont
 
-n=contar_publicaciones_autor('autodefensas.bsky.social','datos.json')
-print(n)
+
+es=Elasticsearch()
+
+with open('datos.json') as f:
+    datos=f.read()
+    datos=json.loads(datos)
+
+result=es.index(index='indice_bsky',body=datos)
+
+print(f'Estado: {result}')
